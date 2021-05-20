@@ -32,9 +32,8 @@ def board_detail(request, pk):
             raise Http404('찾을 수 없는 게시글입니다.')
     else:
         board = BoardForm(request.POST)
-        print(request.POST)
+
         if board.is_valid():
-            print(pk)
             form = Board.objects.get(pk=pk)
             if board.cleaned_data['password'] != form.password:
                 res_data['error'] = '비밀번호가 맞지 않습니다.'
