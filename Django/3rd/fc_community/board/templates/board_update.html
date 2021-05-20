@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <h1>글 수정</h1>
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="col-12">
+        <form method="post" action=".">
+            {% csrf_token %}
+            <div class="form-group ">
+                <label for="title">제목</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{board.title}}" />
+                <label for="registered_dttm">작성일</label>
+                <input type="text" class="form-control" id="registered_dttm" name="registered_dttm" value="{{board.registered_dttm|date:'Y.m.d H:i'}}" readonly/>
+                <label for="contents">내용</label>
+                <textarea id='contents' class="form-control" name="contents" >{{board.contents}}</textarea>
+                <label for="writer">작성자</label>
+                <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
+                <input type="password" class="form-control w-50" id="password" name="password" value="{{board.password}}" hidden/>
+            </div>
+            <div class="row mt-4">
+                <div class="col-6">
+                    <button class="btn btn-primary" onclick="location.href='/board/write/'">돌아가기</button>
+                </div>
+                <div class="col-6" align="right">
+                    <button type="submit" class="btn btn-primary">수정하기</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

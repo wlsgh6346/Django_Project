@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load mathfilters %}
+
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12">
+        <table class="table">
+            <thead class="thead-light text-center">
+                <tr>
+                    <th>No</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>일시</th>
+                </tr>
+            </thead>
+            <tbody class="text-dark text-center">
+                {%for board in boards %}
+                
+                <tr onclick="location.href='/board/detail/{{board.id}}'">
+                    <th>{{ index_value|sub:forloop.counter|add:1 }}</th>
+                    <th>{{board.title}}</th>
+                    <th>{{board.writer}}</th>
+                    <th>{{board.registered_dttm|date:"Y.m.d H:i"}}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-12">
+        <ul class="pagination justify-content-center">
+            
+            {% if boards.has_previous %}
+                <li class='page-item'>
+                    <a class='page-link' href='?p={{ boards.previous_page_number }}'>이전</a>
+                </li>
+            {% endif %}
+                
+            <li class='page-item active'>
+                <a class='page-link' href='#'>{{ boards.number }} / {{ boards.paginator.num_pages }}</a>
+            </li>
+
+            {% if boards.has_next %}
+                <li class='page-item'>
+                    <a class='page-link' href='?p={{ boards.next_page_number }}'>다음</a>
+                </li>
+            {% endif %}
+            
+            
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <button class="btn btn-primary" onclick="location.href='/'">돌아가기</button>
+    </div>
+    <div class="col-6" align="right">
+        <button class="btn btn-primary" onclick="location.href='/board/write/'">글쓰기</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+{% if messages %}
+    {% for message in messages %}
+        alert("{{message}}");
+    {% endfor %}
+{% endif %}
+</script>
+
+
+{% endblock %}
