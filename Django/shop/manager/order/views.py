@@ -1,11 +1,15 @@
-from order.models import Order
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views.generic.edit import FormView
 from django.views.generic import ListView
 from .forms import RegisterForm
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from user.decorators import login_required
 from .models import Order
+from product.models import Product
+from user.models import User
+
+
 # Create your views here.
 
 
@@ -14,8 +18,23 @@ class OrderCreate(FormView):
     form_class = RegisterForm
     success_url = '/product/'
 
+    def form_valid(self, form):
+        # with 안의 모든 처리는 transtion으로 처리됨 - 아주 개꿀임
+        with transaction.atomic():
+            good = Product.objects.get(pk=form.data.get('product'))
+            order = Order(
+                quantity=form.data.get('quantity'),
+                product=good,
+                user=User.objects.get(email=self.request.session.get('user'))
+            )
+            order.save()
+            good.stock -= int(form.data.get('quantity'))
+            good.save()
+
+        return super().form_valid(form)
+
     def form_invalid(self, form):
-        return redirect('/product/' + str(form.product))
+        return redirect('/product/' + str(form.data.get('product')))
 
     # FormView에 존재하는 함수 - 어떤 인자 값을 전달해서 만들지 결정하는 함수 - request를 넣어줘야 함
     def get_form_kwargs(self, **kwargs):
