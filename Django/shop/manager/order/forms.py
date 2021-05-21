@@ -1,7 +1,8 @@
+from product.models import Product
 from django import forms
 from .models import Order
-from product.models import Product
 from user.models import User
+from django.db import transaction
 
 
 class RegisterForm(forms.Form):
@@ -26,12 +27,18 @@ class RegisterForm(forms.Form):
         user = self.request.session.get('user', None)
 
         if quantity and product and user:
-            order = Order(
-                quantity=quantity,
-                product=Product.objects.get(pk=product),
-                user=User.objects.get(email=user)
-            )
-            order.save()
+            # with 안의 모든 처리는 transtion으로 처리됨 - 아주 개꿀임
+            with transaction.atomic():
+                good = Product.objects.get(pk=product)
+                order = Order(
+                    quantity=quantity,
+                    product=Product.objects.get(pk=product),
+                    user=User.objects.get(email=user)
+                )
+                order.save()
+                good.stock -= quantity
+                good.save()
+
         else:
             self.add_error('quantity', '값이 없습니다.')
             self.add_error('product', '값이 없습니다.')
