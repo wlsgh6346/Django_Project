@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+
+
+{% block header %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/min/dropzone.min.css">
+{% endblock %}
+    
+
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <h1>글쓰기</h1>
+    </div>
+</div>
+<div class="row mt-5">
+    {{ error }}
+</div>
+<div class="row mt-5">
+    <div class="col-12">
+        <form method="post" action=".">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                
+                {% if field.name == 'contents' %}
+                    <textarea name="{{ field.name }}" class="form-control" placeholder="{{ field.label}}"></textarea>
+                {% elif field.name == 'writer' %}
+                    <input type="text" class="form-control w-50" placeholder="작성자" name="writer" value="{{ fcuser }}" readonly/>
+                {% elif field.name == 'password' %}
+                    <input type="{{ field.field.widget.input_type }}" class="form-control w-50" placeholder="{{ field.label }}" id="{{ field.id_for_label }}" name="{{ field.name }}" />
+                {% else %}
+                    <input type="{{ field.field.widget.input_type }}" class="form-control" placeholder="{{ field.label }}" id="{{ field.id_for_label }}" name="{{ field.name }}" />
+                {% endif %}
+                    
+            </div>
+            {% if field.errors %}
+            <span style="color: red">{{field.errors}}</span>
+            {% endif %}
+
+            {% endfor %}
+            <!-- <div id="formContainer">
+                <form action="." class="dropzone" id="uploader" style='background-color: whitesmoke'>
+                    <div class="dz-message" data-dz-message><span>드래그 드랍하거나 클릭하여 이미지 선택</span></div>
+                    <div class="fallback">
+                        <input type="file" name="file">
+                    </div>
+                </form>
+            </div> -->
+            <div class='row mt-2'>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">글쓰기</button>
+                    <button type="button" class="btn btn-primary" onclick="location.href='/board/list/'">돌아가기</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+Dropzone.autoDiscover = false;
+
+var dropZoneUploader = new Dropzone('form#uploader', {
+    init: function () {
+        var dropzone = this;
+
+        $('#upload').click(function () {
+            dropZoneUploader.processQueue();
+        });
+
+        dropzone.on("sending", function(file, xhr, formData){
+        formData.append("text", $('#text').val());
+        });
+    },
+    parallelUploads: 10,
+    autoProcessQueue: false,
+    type: 'POST',
+    success: function () {
+    location.reload();
+    },
+    error: function(e) {
+        console.log(e)
+    alert('에러가 발생했습니다. 다시 시도해주세요.');
+    },
+    acceptedFiles: ".jpeg,.jpg,.png,.gif",
+    uploadMultiple: true,
+});
+</script>    
+{% endblock %}
