@@ -4,19 +4,24 @@ from .models import User
 
 
 class RegisterForm(forms.Form):
-    email = forms.EmailField(
+    user_id = forms.CharField(
         error_messages={
-            'required': '이메일을 입력해주세요'
+            'required': '아이디를 입력해주세요'
         },
-        label='이메일', max_length=64
+        label='아이디', max_length=8
+    )
+    name = forms.CharField(
+        error_messages={
+            'required': '이름을 입력해주세요'
+        },
+        label='이름', max_length=10
     )
     password = forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요'
         },
-        widget=forms.PasswordInput, label='비밀번호'
-    )
-    re_password = forms.CharField(
+        widget=forms.PasswordInput, label='비밀번호',
+    re_password=forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요'
         },
@@ -24,10 +29,10 @@ class RegisterForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
-        re_password = cleaned_data.get('re_password')
+        cleaned_data=super().clean()
+        email=cleaned_data.get('email')
+        password=cleaned_data.get('password')
+        re_password=cleaned_data.get('re_password')
 
         if password and re_password:
             if password != re_password:
@@ -36,13 +41,13 @@ class RegisterForm(forms.Form):
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(
+    email=forms.EmailField(
         error_messages={
             'required': '이메일을 입력해주세요'
         },
         label='이메일', max_length=64
     )
-    password = forms.CharField(
+    password=forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요'
         },
@@ -50,13 +55,13 @@ class LoginForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
+        cleaned_data=super().clean()
+        email=cleaned_data.get('email')
+        password=cleaned_data.get('password')
 
         if password and email:
             try:
-                user = User.objects.get(email=email)
+                user=User.objects.get(email=email)
             except User.DoesNotExist:
                 self.add_error(email, '아이디가 없습니다.')
                 return

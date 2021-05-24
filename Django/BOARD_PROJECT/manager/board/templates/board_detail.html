@@ -1,0 +1,64 @@
+
+{% extends "base.html" %}
+
+{% block contents %}
+
+<div class="row mt-5">
+    <div class="col-12">
+        <form method="post" action=".">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{board.title}}" readonly/>
+                <label for="register_date">작성일</label>
+                <input type="text" class="form-control" id="register_date" name="register_date" value="{{board.register_date|date:'Y.m.d H:i'}}" readonly/>
+                <label for="contents">내용</label>
+                <textarea id='contents' class="form-control" name="contents" readonly>{{board.contents}}</textarea>
+                <label for="writer">작성자</label>
+                <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
+                <label for="writer">비밀번호</label>
+                <input type="password" class="form-control w-50" id="password" name="password" />
+                <span style="color: red">{{ res_data.error }}</span>
+            </div>
+            <div class="row mt-4">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary" onclick="location.href='/board/list/'">돌아가기</button>
+                </div>
+                <div class="col-6" align="right">
+                    <button type="submit" class="btn btn-primary">수정</button>
+                    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" >삭제</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        </div>
+        <div class="modal-body">
+            정말로 삭제하시겠습니까?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+            <button type="button" class="btn btn-primary" onclick="delete_modal()">확인</button>
+        </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function delete_modal() {
+        var password_value = $('#password').val();
+        if (password_value == '' || password_value!={{board.password}}){
+            alert('비밀번호가 잘못되었습니다.');
+            $('#myModal').modal('hide');
+            return;
+        }
+        location.replace('/board/delete/{{board.id}}/');
+    }
+</script>
+{% endblock %}
