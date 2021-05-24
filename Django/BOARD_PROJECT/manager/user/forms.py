@@ -34,7 +34,7 @@ class RegisterForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('email')
+        user_id = cleaned_data.get('user_id')
         password = cleaned_data.get('password')
         re_password = cleaned_data.get('re_password')
 
@@ -44,7 +44,7 @@ class RegisterForm(forms.Form):
 
 
 class LoginForm(forms.Form):
-    email = forms.CharField(
+    user_id = forms.CharField(
         error_messages={
             'required': '아이디를 입력해주세요',
             'max_length': '8자리까지만 입력가능합니다.'
@@ -61,10 +61,10 @@ class LoginForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('user_id')
+        user_id = cleaned_data.get('user_id')
         password = cleaned_data.get('password')
 
-        if password and email:
+        if password and user_id:
             try:
                 user = User.objects.get(user_id=user_id)
             except User.DoesNotExist:

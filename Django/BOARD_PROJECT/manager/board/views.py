@@ -5,6 +5,7 @@ from .models import Board
 from user.models import User
 from .forms import BoardForm
 from django.contrib import messages
+from user.decorators import login_required
 
 # Create your views here.
 
@@ -23,6 +24,7 @@ def board_delete(request, pk):
     return redirect('/board/list/', res_data)
 
 
+@login_required
 def board_detail(request, pk):
     res_data = {}
     if request.method == 'GET':
@@ -47,6 +49,7 @@ def board_detail(request, pk):
     return render(request, 'board_detail.html', {'board': board, 'res_data': res_data})
 
 
+@login_required
 def board_update(request, pk):
     res_data = {}
     if request.method == 'GET':
@@ -66,6 +69,7 @@ def board_update(request, pk):
     return render(request, 'board_update.html', {'board': board, 'res_data': res_data})
 
 
+@login_required
 def board_write(request):
     if not request.session.get('user', ''):
         return redirect('/login')

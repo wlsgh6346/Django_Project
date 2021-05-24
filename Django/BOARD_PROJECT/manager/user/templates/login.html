@@ -11,20 +11,34 @@
         {{ error }}
     </div>
 </div>
-<div class="row mt-5">
-    <div class="col-12">
+<div class="row mt-5 justify-content-center">
+    <div class="col-4">
         <form action="." method="POST">
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
                     <label for="{{field.id_for_label}}">{{field.label}}</label>
-                    <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{field.id_for_label}}" placeholder="{{ field.label }}" name="{{ field.name }}" />
+                    <input type="{{ field.field.widget.input_type }}" class="form-control " id="{{field.id_for_label}}" placeholder="{{ field.label }}" name="{{ field.name }}" 
+                    {% ifequal field.name "user_id" %} value="{{form.initial.user_id}}" {% endifequal %}/>
                 </div>
                 {% if field.errors %}
                 <span style="color: red">{{ field.errors }}</span>                
                 {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-primary">로그인</button>
+            <div class="row mt-5 justify-content-center">
+                <div class="form-check col-5">
+                    <input type="checkbox" class="form-check-input" id="save_id" name="save_id"  {% if form.initial.user_id %} checked {% endif %} >
+                    <label class="form-check-label" for="save_id">아이디 저장</label>
+                </div>
+                <div class="form-check col-5">
+                    <input type="checkbox" class="form-check-input" id="auto_login" name="auto_login">
+                    <label class="form-check-label" for="auto_login">자동 로그인</label>
+                </div> 
+            </div>
+            <div class="row mt-5 justify-content-center">
+                <button type="submit" class="btn btn-primary col-4">로그인</button>
+                
+            </div>
         </form>
     </div>
 </div>
