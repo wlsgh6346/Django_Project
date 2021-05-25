@@ -38,6 +38,12 @@ class RegisterForm(forms.Form):
         password = cleaned_data.get('password')
         re_password = cleaned_data.get('re_password')
 
+        try:
+            User.objects.get(user_id=user_id)
+            self.add_error('user_id', '이미 가입된 아이디입니다.')
+        except User.DoesNotExist:
+            pass
+
         if password and re_password:
             if password != re_password:
                 self.add_error('re_password', '비밀번호를 확인하시기 바랍니다.')
@@ -68,7 +74,7 @@ class LoginForm(forms.Form):
             try:
                 user = User.objects.get(user_id=user_id)
             except User.DoesNotExist:
-                self.add_error(user_id, '아이디가 없습니다.')
+                self.add_error('user_id', '아이디가 없습니다.')
                 return
 
             if not check_password(password, user.password):
