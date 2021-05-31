@@ -28,6 +28,7 @@ def board_delete(request, pk):
 def board_detail(request, pk):
     res_data = {}
     if request.method == 'GET':
+
         try:
             board = Board.objects.get(pk=pk)
         except Board.DoesNotExist:
@@ -45,8 +46,12 @@ def board_detail(request, pk):
         else:
             board = Board.objects.get(pk=pk)
             res_data['error'] = '비밀번호를 입력해주세요.'
+    if str(board.writer) == request.session.get('user', ''):
+        myboard = True
+    else:
+        myboard = False
 
-    return render(request, 'board_detail.html', {'board': board, 'res_data': res_data})
+    return render(request, 'board_detail.html', {'board': board, 'myboard': myboard, 'res_data': res_data})
 
 
 @login_required
@@ -58,9 +63,17 @@ def board_update(request, pk):
         except Board.DoesNotExist:
             raise Http404('찾을 수 없는 게시글입니다.')
     else:
+        file_change_check = request.POST.get('checkFileChange', False)
+
         form = BoardForm(request.POST)
         if form.is_valid():
             board = Board.objects.get(pk=pk)
+            if file_change_check:
+                try:
+                    doc = request.FILES
+                    board.file = doc['file']
+                except:
+                    board.file = ''
             board.title = form.cleaned_data['title']
             board.contents = form.cleaned_data['contents']
             board.save()
@@ -85,6 +98,11 @@ def board_write(request):
             board.contents = form.cleaned_data['contents']
             board.password = form.cleaned_data['password']
             board.writer = user
+            try:
+                doc = request.FILES
+                board.file = doc['file']
+            except:
+                pass
             board.save()
             messages.info(request, '등록완료되었습니다.')
             return redirect('/board/list/')

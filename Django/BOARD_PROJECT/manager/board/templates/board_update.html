@@ -8,7 +8,7 @@
 </div>
 <div class="row mt-5">
     <div class="col-12">
-        <form method="post" action=".">
+        <form method="post" action="." enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="form-group ">
@@ -21,6 +21,22 @@
                 <label for="writer">작성자</label>
                 <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
                 <input type="password" class="form-control w-50" id="password" name="password" value="{{board.password}}" hidden/>
+                
+            </div>
+            
+            <div class="form-group">
+                
+                <label for="writer" class="mb-1">파일 첨부</label>
+                {%if board.file %}
+                <div class="form-check col-5 mb-1">
+                    <input type="checkbox" class="form-check-input" id="checkFileChange" name="checkFileChange">
+                    <label class="form-check-label" for="checkFileChange"> <a href="/media/{{board.file}}">{{board.file}}</a></label>
+                </div>
+                <input type="file" name="file" class="form-control w-50" id="id_file" disabled/>
+                {% else %}
+                <input type="file" name="file" class="form-control w-50" id="id_file" />
+                {% endif %}
+                
             </div>
             <div class="row mt-4">
                 <div class="col-6">
@@ -33,5 +49,15 @@
         </form>
     </div>
 </div>
-
+<script>
+    $(document).ready(function(){
+        $("#checkFileChange").change(function(){
+            if($("#checkFileChange").is(":checked")){
+                $("#id_file").attr("disabled", false);
+            }else{
+                $("#id_file").attr("disabled", true);
+            }
+        });
+    });
+</script>
 {% endblock %}

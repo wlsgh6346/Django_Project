@@ -5,7 +5,7 @@
 
 <div class="row mt-5">
     <div class="col-12">
-        <form method="post" action=".">
+        <form method="post" action="." enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 <label for="title">제목</label>
@@ -18,16 +18,28 @@
                 <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
                 <label for="writer">비밀번호</label>
                 <input type="password" class="form-control w-50" id="password" name="password" />
+
+                {%if board.file %}
+                <label for="writer">파일 첨부</label>
+                <a href="/media/{{board.file}}" class="form-control w-50">{{board.file}}</a>
+                {% else %}
+                <label for="writer">파일 첨부</label>
+                <input type="text" class="form-control w-50" id="id_file" name="file" value="업로드된 파일 없음" readonly/>
+                {% endif %}
+
                 <span style="color: red">{{ res_data.error }}</span>
             </div>
             <div class="row mt-4">
                 <div class="col-6">
                     <button type="button" class="btn btn-primary" onclick="location.href='/board/list/'">돌아가기</button>
                 </div>
+                
+                {%if myboard%}
                 <div class="col-6" align="right">
                     <button type="submit" class="btn btn-primary">수정</button>
                     <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" >삭제</button>
                 </div>
+                {% endif %}
             </div>
         </form>
     </div>

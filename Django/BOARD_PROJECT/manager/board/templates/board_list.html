@@ -29,6 +29,7 @@
                 <tr>
                     <th>No</th>
                     <th>제목</th>
+                    <th>파일</th>
                     <th>작성자</th>
                     <th>일시</th>
                 </tr>
@@ -36,9 +37,17 @@
             <tbody class="text-dark text-center">
                 {%for board in boards %}
                 
-                <tr onclick="location.href='/board/detail/{{board.id}}'">
-                    <th>{{ index_value|sub:forloop.counter|add:1 }}</th>
-                    <th>{{board.title}}</th>
+                <tr>
+                    <th onclick="location.href='/board/detail/{{board.id}}'">{{ index_value|sub:forloop.counter|add:1 }}</th>
+                    <th onclick="location.href='/board/detail/{{board.id}}'">{{board.title}}</th>
+                    {% if board.file %}
+                    <th><a href="/media/{{board.file}}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+                        <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+                      </svg></a></th>
+                    {% else %}
+                    <th>X</th>
+                    {% endif %}
+                    
                     <th>{{board.writer}}</th>
                     <th>{{board.register_date|date:"Y.m.d H:i"}}</th>
                 </tr>

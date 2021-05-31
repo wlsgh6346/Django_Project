@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from user.views import index, RegisterView, LoginView, logout
 from board import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
@@ -29,3 +32,5 @@ urlpatterns = [
     path('board/update/<int:pk>/', views.board_update),
     path('board/delete/<int:pk>/', views.board_delete),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -49,7 +49,7 @@ class LoginView(FormView):
         if form.data.get('save_id'):
             self.request.session['user_id'] = form.data.get('user_id')
         else:
-            if self.request.session['user_id']:
+            if self.request.session.get('user_id', ''):
                 del(self.request.session['user_id'])
 
         return super().form_valid(form)

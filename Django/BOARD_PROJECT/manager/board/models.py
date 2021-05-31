@@ -1,13 +1,5 @@
 from django.db import models
-from uuid import uuid4
-from datetime import datetime
 # Create your models here.
-
-
-def get_file_path(instance, filename):
-    ymd_path = datetime.now().strftime('%Y/%m/%d')
-    uuid_name = uuid4().hex
-    return '/'.join(['upload_file/', ymd_path, uuid_name])
 
 
 class Board(models.Model):
@@ -20,7 +12,7 @@ class Board(models.Model):
     password = models.CharField(max_length=64,
                                 verbose_name='비밀번호')
     file_path = models.CharField(max_length=255, verbose_name='첨부 파일')
-    file = models.FileField(upload_to=get_file_path, null=True, blank=True, verbose_name='파일')
+    file = models.FileField(null=True, blank=True, verbose_name='파일')
     # class를 반환하지 말고 안에 username을 반환하게 변경 fcuser object -> username이 나오게 됨
 
     def __str__(self):

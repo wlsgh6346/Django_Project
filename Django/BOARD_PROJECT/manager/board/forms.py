@@ -18,3 +18,4 @@ class BoardForm(forms.Form):
             'required': '비밀번호를 입력해주세요.'
         },
         widget=forms.PasswordInput, max_length=64, label="비밀번호")
+    file = forms.FileField(required=False, label="파일 첨부")
