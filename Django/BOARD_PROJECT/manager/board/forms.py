@@ -13,9 +13,11 @@ class BoardForm(forms.Form):
         },
         widget=forms.Textarea, label="내용")
     writer = forms.CharField(max_length=32, label="작성자")
-    password = forms.CharField(
+
+
+class CommentForm(forms.Form):
+    comment = forms.CharField(
         error_messages={
-            'required': '비밀번호를 입력해주세요.'
+            'required': '내용 입력해주세요.'
         },
-        widget=forms.PasswordInput, max_length=64, label="비밀번호")
-    file = forms.FileField(required=False, label="파일 첨부")
+        max_length=255, label="댓글")

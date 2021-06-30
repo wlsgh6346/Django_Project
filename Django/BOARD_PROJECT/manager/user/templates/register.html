@@ -11,22 +11,111 @@
         {{ error }}
     </div>
 </div>
-<div class="row mt-5">
-    <div class="col-12">
+<div class="row">
+    <div class="col-12" align="center">
         <form action="." method="POST">
             {% csrf_token %}
             {% for field in form %}
-                <div class="form-group">
-                    <label for="{{field.id_for_label}}">{{field.label}}</label>
-                    <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{field.id_for_label}}" placeholder="{{ field.label }}" name="{{ field.name }}" />
-                </div>
+            {% if field.name != 'email_1' %}
+            <div class="form-group w-25">
+                <label for="{{field.id_for_label}}" class="mb-2 mt-2">{{field.label}}</label>
+                <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{field.id_for_label}}" placeholder="{{ field.label }}" name="{{ field.name }}" />
                 {% if field.errors %}
                 <span style="color: red">{{ field.errors }}</span>                
                 {% endif %}
+            </div>
+            {% endif %}
             {% endfor %}
+            <div class="form-group">
+                <label for="id_email_1" class="mb-2 mt-2">이메일</label>
+                <div class="input-group mb-3" style="width: 50%;">
+                    <input type="text" class="form-control" id="email_1" name="email_1" placeholder="이메일" aria-describedby="basic-addon2">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" id="email_2" name="email_2" placeholder="직접입력" value='' autocomplete="off">
+                    <div class="input-group-append">
+                        <select class="form-control" id="select_email">
+                            <option value="">메일선택 ></option>
+                            <option value="nate.com">nate.com</option>
+                            <option value="hanmail.net">hanmail.net</option>
+                            <option value="naver.com">naver.com</option>
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="">직접입력</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="margin-left: 20px;" type="button" id="auth-button">인증번호전송</button>
+                </div>
+                {% if form.email_1.errors %}
+                <span style="color: red">{{form.email_1.errors }}</span>                
+                {% endif %}
+            </div>
+            <div class="form-group w-25 mb-4 d-none" id="auth-code-div">
+                <label for="auth-code" class="mb-2 mt-2">가입인증코드</label>
+                <input type="text" class="form-control" id="auth-code" placeholder="인증번호를 입력해주세요" name="auth-code" />
+                <span id="timeset"></span>
+            </div>
+            
             <button type="submit" class="btn btn-primary">회원가입</button>
         </form>
     </div>
 </div>
+<script>
+    $('#select_email').on('change', function() {
+        var email = $("#select_email option:selected").val();
+        $('#email_2').val(email);
+    });
+
+    $('#auth-button').click(function() {
+        var email_1 = $('#email_1').val();
+        var email_2 = $('#email_2').val();
+        if (!email_1 || !email_2) {
+            alert('이메일 똑바로 입력해라');
+            return;
+        }
+        var ajax_email = email_1+"@"+email_2;
+        
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'ajax_send_auth_email' %}",
+            data: {
+                email: ajax_email
+            },
+            dataType: "json",
+            success: function(response) {
+                alert('성공적으로 인증번호를 전송했습니다.');
+                $('#auth-code-div').removeClass('d-none');
+                function countdown( elementName, minutes, seconds ) {
+                    var elementName, endTime, hours, mins, msLeft, time;
+                    function twoDigits( n ) {
+                        return (n <= 9 ? "0" + n : n);
+                    }
+                    function updateTimer() {
+                        msLeft = endTime - (+new Date);
+                        if ( msLeft < 1000 ) {
+                            alert("인증시간이 초과되었습니다.");
+                            $("" + elementName).remove();
+                            cert_ok = false;
+                            certificationNum = false;
+                            location.reload();
+                        } else {
+                            time = new Date( msLeft );
+                            hours = time.getUTCHours();
+                            mins = time.getUTCMinutes();
+                            $("" + elementName).html((hours ? hours + ':' + twoDigits( mins ) : twoDigits(mins))
+                            + ':' + twoDigits( time.getUTCSeconds()));
+                            setTimeout( updateTimer, time.getUTCMilliseconds() + 500 );
+                        }
+                    }
+                    endTime = (+new Date) + 1000 * (60*minutes + seconds) + 500;
+                    updateTimer();
+                }
+                countdown("#timeset", 2, 0)
+            },
+            error: function(request, status, error) {
+                alert('에러발생');
+            }
+        });           
+    })
+</script>
 {% endblock %}
     

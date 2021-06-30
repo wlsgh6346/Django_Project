@@ -4,6 +4,7 @@ from .models import Order
 from user.models import User
 
 
+
 class RegisterForm(forms.Form):
 
     def __init__(self, request, *args, **kwargs):

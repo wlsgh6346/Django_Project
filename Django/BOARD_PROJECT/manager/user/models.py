@@ -9,8 +9,10 @@ class User(models.Model):
     password = models.CharField(max_length=128, verbose_name='비밀번호')
 
     register_date = models.DateTimeField(auto_now_add=True, verbose_name='등록날짜')
-
+    email = models.EmailField(verbose_name='이메일',  default=None)
+    is_active = models.BooleanField(verbose_name='활성화', default=False)
     # 각 model을 문자열로 변환했을 때 보여지는 설정
+
     def __str__(self):
         return self.user_id
 

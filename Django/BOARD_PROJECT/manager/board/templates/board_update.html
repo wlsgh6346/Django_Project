@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block header %}
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+{% endblock %}
+
 {% block contents %}
 <div class="row mt-5">
     <div class="col-12 text-center">
@@ -8,7 +13,7 @@
 </div>
 <div class="row mt-5">
     <div class="col-12">
-        <form method="post" action="." enctype="multipart/form-data">
+        <form id="updateForm" method="post" action="." enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="form-group ">
@@ -20,30 +25,43 @@
                 <textarea id='contents' class="form-control" name="contents" >{{board.contents}}</textarea>
                 <label for="writer">작성자</label>
                 <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
-                <input type="password" class="form-control w-50" id="password" name="password" value="{{board.password}}" hidden/>
                 
             </div>
             
             <div class="form-group">
-                
+
                 <label for="writer" class="mb-1">파일 첨부</label>
-                {%if board.file %}
+                {%if board.files.all %}
+                {% for file in board.files.all %}
                 <div class="form-check col-5 mb-1">
-                    <input type="checkbox" class="form-check-input" id="checkFileChange" name="checkFileChange">
-                    <label class="form-check-label" for="checkFileChange"> <a href="/media/{{board.file}}">{{board.file}}</a></label>
+                    <input type="checkbox" class="form-check-input" name="checkFileChange[]" value="{{file.id}}">
+                    <label class="form-check-label" for="checkFileChange"> <a href="/media/{{file.file}}">{{file.filename}}</a></label>
                 </div>
-                <input type="file" name="file" class="form-control w-50" id="id_file" disabled/>
+                {% endfor %}
+                <div id="file-form" class="form-group mb-2">
+                    <div class="input-group w-50" id="item_0" name="file-item">
+                        <input type="file" name="files" class="form-control " id="id_file" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                        <div class="input-group-append" style="margin-left: 5px">
+                            <button id="button-add-file" class="btn btn-outline-secondary" type="button">+</button>
+                        </div>
+                    </div>
+                </div>
                 {% else %}
-                <input type="file" name="file" class="form-control w-50" id="id_file" />
+                <div id="file-form" class="form-group mb-2">
+                    <div class="input-group w-50" id="item_0" name="file-item">
+                        <input type="file" name="files" class="form-control " id="id_file" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                        <div class="input-group-append" style="margin-left: 5px">
+                            <button id="button-add-file" class="btn btn-outline-secondary" type="button">+</button>
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
-                
-            </div>
             <div class="row mt-4">
                 <div class="col-6">
-                    <button class="btn btn-primary" onclick="location.href='/board/write/'">돌아가기</button>
+                    <button type="button" class="btn btn-primary" onclick="location.href='/board/list/'">돌아가기</button>
                 </div>
                 <div class="col-6" align="right">
-                    <button type="submit" class="btn btn-primary">수정하기</button>
+                    <button type="button" id="updateButton" class="btn btn-primary">수정하기</button>
                 </div>
             </div>
         </form>
@@ -58,6 +76,40 @@
                 $("#id_file").attr("disabled", true);
             }
         });
+
+        $("#updateButton").click(function(){
+            if (confirm("정말 수정하시겠습니까?") == true){    //확인
+                $("#updateForm").submit();
+            }else{   //취소
+                return;
+            }
+        });
     });
+    $('#contents').summernote({
+        placeholder: '적으려면 적던가',
+        tabsize: 2,
+        height: 400
+    });
+    var count = 1;
+    $(function(){
+        
+        $('#button-add-file').click(addFileForm);
+        $(document).on('click', '.button-delete-file', function(event) {
+            $(this).parent().parent().remove();
+        });
+    });
+    
+    function addFileForm() {
+        var file_input_num = $('[name="file-item"]').length;
+        var current_file_num = $('[name="checkFileChange"]').length;
+        if(file_input_num + current_file_num < 10) {
+            var html = "<div id='item_"+count+"' class='input-group w-50 mt-2' name='file-item'>";
+            html += "<input type='file' name='files' class='form-control' aria-label='Recipient's username' aria-describedby='basic-addon2' />";
+            html += "<div class='input-group-append' style='margin-left: 5px'>"
+            html += "<button type='button' class='btn btn-outline-secondary button-delete-file'>삭제</button></div></div>";
+            count++;
+            $("#file-form").append(html);
+        }
+    }
 </script>
 {% endblock %}

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from user.views import index, RegisterView, LoginView, logout
+from user.views import index, RegisterView, LoginView, logout, ajax_send_auth_email
 from board import views
 
 urlpatterns = [
@@ -31,6 +31,13 @@ urlpatterns = [
     path('board/write/', views.board_write),
     path('board/update/<int:pk>/', views.board_update),
     path('board/delete/<int:pk>/', views.board_delete),
+    path('board/like/<int:pk>/', views.like_board, name="like_board"),
+    path('board/comment/', views.write_comment, name="write_comment"),
+    path('board/delete_comment/<int:pk>', views.delete_comment, name="delete_comment"),
+    path('board/board_delete_multi', views.board_delete_multi),
+    path('ajax_send_auth_email/', ajax_send_auth_email, name="ajax_send_auth_email"),
+    path('download_zip_file/<int:pk>', views.download_zip_file),
+    path('board_test/',views.board_test)
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

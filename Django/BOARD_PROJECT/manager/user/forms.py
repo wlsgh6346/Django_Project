@@ -4,6 +4,8 @@ from .models import User
 
 
 class RegisterForm(forms.Form):
+    
+        
     user_id = forms.CharField(
         error_messages={
             'required': '아이디를 입력해주세요',
@@ -31,22 +33,36 @@ class RegisterForm(forms.Form):
         },
         widget=forms.PasswordInput, label='비밀번호 확인'
     )
+    email_1 = forms.CharField(
+        error_messages={
+            'required': '이메일을 입력해주세요'
+        },
+        label='이메일', max_length=64
+    )
 
     def clean(self):
         cleaned_data = super().clean()
         user_id = cleaned_data.get('user_id')
         password = cleaned_data.get('password')
         re_password = cleaned_data.get('re_password')
+        user_request = self.initial['request']
+        
+        if  user_request.session.get('auth_email') == cleaned_data.get('auth-code'):
+            self.add_error('email_1', '인증코드가 틀렸습니다.')
 
         try:
             User.objects.get(user_id=user_id)
             self.add_error('user_id', '이미 가입된 아이디입니다.')
         except User.DoesNotExist:
             pass
-
+        
+        
+        print()
         if password and re_password:
             if password != re_password:
                 self.add_error('re_password', '비밀번호를 확인하시기 바랍니다.')
+        
+        
 
 
 class LoginForm(forms.Form):
@@ -66,6 +82,7 @@ class LoginForm(forms.Form):
     )
 
     def clean(self):
+
         cleaned_data = super().clean()
         user_id = cleaned_data.get('user_id')
         password = cleaned_data.get('password')
@@ -76,6 +93,5 @@ class LoginForm(forms.Form):
             except User.DoesNotExist:
                 self.add_error('user_id', '아이디가 없습니다.')
                 return
-
             if not check_password(password, user.password):
                 self.add_error('password', '비밀번호가 틀립니다.')

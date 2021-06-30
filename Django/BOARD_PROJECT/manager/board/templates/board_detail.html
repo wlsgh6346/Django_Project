@@ -1,37 +1,83 @@
 
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block contents %}
-
+{{board.update_counter}}
 <div class="row mt-5">
     <div class="col-12">
+        
         <form method="post" action="." enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 <label for="title">제목</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{board.title}}" readonly/>
+                <input type="text" class="form-control mb-3" id="title" name="title" value="{% if board.writer in board.like_users.all %}♥{% endif %}{{board.title}}" readonly/>
                 <label for="register_date">작성일</label>
-                <input type="text" class="form-control" id="register_date" name="register_date" value="{{board.register_date|date:'Y.m.d H:i'}}" readonly/>
+                <input type="text" class="form-control mb-3" id="register_date" name="register_date" value="{{board.register_date|date:'Y.m.d H:i'}}" readonly/>
                 <label for="contents">내용</label>
-                <textarea id='contents' class="form-control" name="contents" readonly>{{board.contents}}</textarea>
+                <div class="card mb-3" >
+                    <div class="card-body">
+                        <h5 class="card-title"></h5>
+                        <p class="card-text">{{board.contents|safe}}</p>
+                    </div>
+                </div>        
                 <label for="writer">작성자</label>
-                <input type="text" class="form-control w-50" id="writer" name="writer" value="{{board.writer}}" readonly/>
-                <label for="writer">비밀번호</label>
-                <input type="password" class="form-control w-50" id="password" name="password" />
-
-                {%if board.file %}
+                <input type="text" class="form-control w-50 mb-3" id="writer" name="writer" value="{{board.writer}}" readonly/>
                 <label for="writer">파일 첨부</label>
-                <a href="/media/{{board.file}}" class="form-control w-50">{{board.file}}</a>
+                {%if board.files.all %}
+                {% for file in board.files.all %}
+                <a href="/media/{{file.file}}" class="form-control w-50 mb-3" download>{{file.filename}}</a>
+                {% endfor %}
                 {% else %}
-                <label for="writer">파일 첨부</label>
-                <input type="text" class="form-control w-50" id="id_file" name="file" value="업로드된 파일 없음" readonly/>
+                <input type="text" class="form-control w-50 mb-3" id="id_file" name="file" value="업로드된 파일 없음" readonly/>
                 {% endif %}
+                <textarea name="contents" id="contents" class="form-control" hidden>{{board.contents}}</textarea>
 
-                <span style="color: red">{{ res_data.error }}</span>
+                
             </div>
+            <div class="border border-primary rounded p-2 mb-3">
+                <div class="mx-n2 p-2 bg-light">
+                    {% if comment_list %}
+                        {% for comment in comment_list %}
+                        <div class="media mb-4">
+                            <div class="media-body">
+                                    <h5>
+                                        {{comment.username}} <small class="text-muted"> {{comment.created_at|date:'Y.m.d H:i'}}</small>
+                                    </h5>
+                                {{comment.contents}}
+                                {% if comment.username == request.session.user %}
+                                <button type="button" class="btn btn-primary bg-white text-dark border-0" style="float: right;" onclick="delete_comment({{comment.id}})">X</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        없음
+                    {% endif %}
+                    <div class="media">
+                        <div class="media-body input-group">
+                            <input type="text" id="commentInput" class="form-control border form-control-sm" placeholder="댓글 쓰셈"/>
+                            <span style="color: red">{{ res_data.error }}</span>
+                            <div class="input-group-append">
+                                <button type="button" id="comment" name="comment" class="btn btn-primary">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
             <div class="row mt-4">
                 <div class="col-6">
                     <button type="button" class="btn btn-primary" onclick="location.href='/board/list/'">돌아가기</button>
+                    <button type="button" class="btn btn-primary" onclick="location.href='/board/write/?reply={{board.id}}'">답글쓰기</button>
+                    <a href="{% url 'like_board' board.id %}" class="btn btn-primary">
+                        {% if board.writer in board.like_users.all %}
+                        <i class="fas fa-heart"></i>
+                        {% else %}
+                        <i class="far fa-heart"></i>
+                        {% endif %}
+                    </a>
                 </div>
                 
                 {%if myboard%}
@@ -43,6 +89,7 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -64,13 +111,33 @@
 </div>
 <script type="text/javascript">
     function delete_modal() {
-        var password_value = $('#password').val();
-        if (password_value == '' || password_value!={{board.password}}){
-            alert('비밀번호가 잘못되었습니다.');
-            $('#myModal').modal('hide');
-            return;
-        }
         location.replace('/board/delete/{{board.id}}/');
+    }
+
+    $("#comment").click(function() {
+        var comment = $('#commentInput').val();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'write_comment' %}",
+            data: {
+                comment: comment,
+                board_id: {{board.id}}
+            },
+            dataType: "json",
+            success: function(response) {
+                location.reload();
+            },
+            error: function(request, status, error) {
+                alert('에러발생');
+            }
+        });
+    })
+    function delete_comment(comment_id) {
+        var confirmflag = confirm('정말 댓글을 삭제하시겠습니까?')
+        if(confirmflag)
+            location.href = '/board/delete_comment/'+ (comment_id);
+        else
+            return;
     }
 </script>
 {% endblock %}

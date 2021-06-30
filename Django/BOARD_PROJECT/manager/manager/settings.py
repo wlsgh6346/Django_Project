@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'board',
     'user',
-    'mathfilters'
+    'mathfilters',
+    'six',
+    
 ]
 
 MIDDLEWARE = [
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'manager.urls'
@@ -140,3 +143,19 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+
+
+
+
+####################### Email #######################
+EMAIL_HOST_PASSWORD = 'wlsgh6346!'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'
+EMAIL_HOST_USER = 'wlsgh6346'
+EMAIL_HOST_PASSWORD = "qktydqhtyd1@"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+DEFAULT_FROM_MAIL = EMAIL_HOST_USER
+#####################################################
